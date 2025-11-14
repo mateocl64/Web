@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Contenido - Movexa Admin</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div class="admin-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2><i class="fas fa-shield-alt"></i> Movexa Admin</h2>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html">
+          <i class="fas fa-home"></i> Dashboard
+        </a>
+        <a href="services.html">
+          <i class="fas fa-cogs"></i> Servicios
+        </a>
+        <a href="content.html" class="active">
+          <i class="fas fa-edit"></i> Contenido
+        </a>
+        <a href="messages.html">
+          <i class="fas fa-envelope"></i> Mensajes
+        </a>
+        <a href="#" onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+        </a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <header class="top-bar">
+        <h1>Gestión de Contenido</h1>
+        <div class="user-info">
+          <span id="userName"></span>
+          <i class="fas fa-user-circle"></i>
+        </div>
+      </header>
+
+      <div class="content">
+        <div class="content-sections">
+          <!-- Hero Section -->
+          <div class="content-card">
+            <h2><i class="fas fa-star"></i> Sección Hero (Inicio)</h2>
+            <form id="heroForm" class="content-form">
+              <div class="form-group">
+                <label for="heroTitle">Título</label>
+                <input type="text" id="heroTitle" name="title">
+              </div>
+              <div class="form-group">
+                <label for="heroSubtitle">Subtítulo</label>
+                <textarea id="heroSubtitle" name="subtitle" rows="2"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="heroImage">Imagen (ruta)</label>
+                <input type="text" id="heroImage" name="image">
+              </div>
+              <button type="submit" class="btn-primary">
+                <i class="fas fa-save"></i> Guardar Cambios
+              </button>
+            </form>
+          </div>
+
+          <!-- About Section -->
+          <div class="content-card">
+            <h2><i class="fas fa-users"></i> Sección Nosotros</h2>
+            <form id="aboutForm" class="content-form">
+              <div class="form-group">
+                <label for="aboutTitle">Título</label>
+                <input type="text" id="aboutTitle" name="title">
+              </div>
+              <div class="form-group">
+                <label for="aboutDescription">Descripción</label>
+                <textarea id="aboutDescription" name="description" rows="4"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="aboutImage">Imagen (ruta)</label>
+                <input type="text" id="aboutImage" name="image">
+              </div>
+              <div class="form-group">
+                <label for="aboutQuote">Cita</label>
+                <input type="text" id="aboutQuote" name="quote">
+              </div>
+              <button type="submit" class="btn-primary">
+                <i class="fas fa-save"></i> Guardar Cambios
+              </button>
+            </form>
+          </div>
+
+          <!-- Contact Section -->
+          <div class="content-card">
+            <h2><i class="fas fa-envelope"></i> Sección Contacto</h2>
+            <form id="contactForm" class="content-form">
+              <div class="form-group">
+                <label for="contactTitle">Título</label>
+                <input type="text" id="contactTitle" name="title">
+              </div>
+              <div class="form-group">
+                <label for="contactDescription">Descripción</label>
+                <textarea id="contactDescription" name="description" rows="2"></textarea>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="contactEmail">Email</label>
+                  <input type="email" id="contactEmail" name="email">
+                </div>
+                <div class="form-group">
+                  <label for="contactPhone">Teléfono</label>
+                  <input type="text" id="contactPhone" name="phone">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="contactAddress">Dirección</label>
+                  <input type="text" id="contactAddress" name="address">
+                </div>
+                <div class="form-group">
+                  <label for="contactHours">Horario</label>
+                  <input type="text" id="contactHours" name="hours">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="contactQuote">Cita</label>
+                <input type="text" id="contactQuote" name="quote">
+              </div>
+              <button type="submit" class="btn-primary">
+                <i class="fas fa-save"></i> Guardar Cambios
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/admin.js"></script>
+  <script>
+    let content = {};
+
+    async function loadContent() {
+      try {
+        const response = await fetchWithAuth('/api/content');
+        if (response.ok) {
+          content = await response.json();
+          populateForms();
+        } else {
+          showNotification('Error al cargar contenido', 'error');
+        }
+      } catch (error) {
+        console.error('Error loading content:', error);
+        showNotification('Error al cargar contenido', 'error');
+      }
+    }
+
+    function populateForms() {
+      // Hero section
+      if (content.hero) {
+        document.getElementById('heroTitle').value = content.hero.title || '';
+        document.getElementById('heroSubtitle').value = content.hero.subtitle || '';
+        document.getElementById('heroImage').value = content.hero.image || '';
+      }
+
+      // About section
+      if (content.about) {
+        document.getElementById('aboutTitle').value = content.about.title || '';
+        document.getElementById('aboutDescription').value = content.about.description || '';
+        document.getElementById('aboutImage').value = content.about.image || '';
+        document.getElementById('aboutQuote').value = content.about.quote || '';
+      }
+
+      // Contact section
+      if (content.contact) {
+        document.getElementById('contactTitle').value = content.contact.title || '';
+        document.getElementById('contactDescription').value = content.contact.description || '';
+        document.getElementById('contactEmail').value = content.contact.email || '';
+        document.getElementById('contactPhone').value = content.contact.phone || '';
+        document.getElementById('contactAddress').value = content.contact.address || '';
+        document.getElementById('contactHours').value = content.contact.hours || '';
+        document.getElementById('contactQuote').value = content.contact.quote || '';
+      }
+    }
+
+    async function updateSection(section, data) {
+      try {
+        const response = await fetchWithAuth(`/api/content/${section}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+          showNotification('Contenido actualizado correctamente', 'success');
+          loadContent();
+        } else {
+          showNotification('Error al actualizar contenido', 'error');
+        }
+      } catch (error) {
+        console.error('Error updating content:', error);
+        showNotification('Error al actualizar contenido', 'error');
+      }
+    }
+
+    // Hero form
+    document.getElementById('heroForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = {
+        title: document.getElementById('heroTitle').value,
+        subtitle: document.getElementById('heroSubtitle').value,
+        image: document.getElementById('heroImage').value
+      };
+      await updateSection('hero', data);
+    });
+
+    // About form
+    document.getElementById('aboutForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = {
+        title: document.getElementById('aboutTitle').value,
+        description: document.getElementById('aboutDescription').value,
+        image: document.getElementById('aboutImage').value,
+        quote: document.getElementById('aboutQuote').value
+      };
+      await updateSection('about', data);
+    });
+
+    // Contact form
+    document.getElementById('contactForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = {
+        title: document.getElementById('contactTitle').value,
+        description: document.getElementById('contactDescription').value,
+        email: document.getElementById('contactEmail').value,
+        phone: document.getElementById('contactPhone').value,
+        address: document.getElementById('contactAddress').value,
+        hours: document.getElementById('contactHours').value,
+        quote: document.getElementById('contactQuote').value
+      };
+      await updateSection('contact', data);
+    });
+
+    loadContent();
+  </script>
+</body>
+</html>
