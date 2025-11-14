@@ -8,6 +8,7 @@ require('dotenv').config();
 const authRoutes = require('./routes/auth');
 const servicesRoutes = require('./routes/services');
 const contentRoutes = require('./routes/content');
+const profileRoutes = require('./routes/profile');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -30,6 +31,7 @@ app.use(express.static(path.join(__dirname, '..')));
 app.use('/api/auth', authRoutes);
 app.use('/api/services', servicesRoutes);
 app.use('/api/content', contentRoutes);
+app.use('/api/profile', profileRoutes);
 
 // Root endpoint
 app.get('/api', (req, res) => {
@@ -39,7 +41,13 @@ app.get('/api', (req, res) => {
     endpoints: {
       auth: {
         login: 'POST /api/auth/login',
+        register: 'POST /api/auth/register',
         verify: 'GET /api/auth/verify'
+      },
+      profile: {
+        getProfile: 'GET /api/profile (auth required)',
+        updateProfile: 'PUT /api/profile (auth required)',
+        changePassword: 'PUT /api/profile/password (auth required)'
       },
       services: {
         getAll: 'GET /api/services',

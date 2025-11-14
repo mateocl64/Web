@@ -36,17 +36,22 @@ router.post('/login', (req, res) => {
 
   try {
     const users = JSON.parse(fs.readFileSync(usersFilePath, 'utf8'));
-    const user = users.find(u => u.username === username);
+    const userIndex = users.findIndex(u => u.username === username);
 
-    if (!user) {
+    if (userIndex === -1) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
+    const user = users[userIndex];
     const isValidPassword = bcrypt.compareSync(password, user.password);
 
     if (!isValidPassword) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
+
+    // Update lastLogin timestamp
+    users[userIndex].lastLogin = new Date().toISOString();
+    fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2));
 
     const token = jwt.sign(
       { id: user.id, username: user.username, role: user.role },
@@ -59,6 +64,7 @@ router.post('/login', (req, res) => {
       user: {
         id: user.id,
         username: user.username,
+        email: user.email,
         role: user.role
       }
     });
@@ -81,6 +87,84 @@ router.get('/verify', (req, res) => {
     res.json({ valid: true, user: decoded });
   } catch (error) {
     res.status(401).json({ valid: false, message: 'Invalid or expired token' });
+  }
+});
+
+// Register endpoint
+router.post('/register', (req, res) => {
+  const { username, email, password } = req.body;
+
+  // Validate required fields
+  if (!username || !email || !password) {
+    return res.status(400).json({ message: 'Username, email, and password are required' });
+  }
+
+  // Validate username length
+  if (username.length < 3) {
+    return res.status(400).json({ message: 'Username must be at least 3 characters' });
+  }
+
+  // Validate password length
+  if (password.length < 6) {
+    return res.status(400).json({ message: 'Password must be at least 6 characters' });
+  }
+
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ message: 'Invalid email format' });
+  }
+
+  try {
+    const users = JSON.parse(fs.readFileSync(usersFilePath, 'utf8'));
+
+    // Check if username already exists
+    if (users.find(u => u.username === username)) {
+      return res.status(400).json({ message: 'Username already exists' });
+    }
+
+    // Check if email already exists
+    if (users.find(u => u.email === email)) {
+      return res.status(400).json({ message: 'Email already exists' });
+    }
+
+    // Generate new user ID
+    const newId = users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1;
+
+    // Hash password
+    const hashedPassword = bcrypt.hashSync(password, 10);
+
+    // Create new user
+    const now = new Date().toISOString();
+    const newUser = {
+      id: newId,
+      username,
+      email,
+      password: hashedPassword,
+      role: 'editor',
+      createdAt: now,
+      lastLogin: now
+    };
+
+    // Add user to array
+    users.push(newUser);
+
+    // Save to file
+    fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2));
+
+    // Return success response (without password)
+    res.status(201).json({
+      message: 'User registered successfully',
+      user: {
+        id: newUser.id,
+        username: newUser.username,
+        email: newUser.email,
+        role: newUser.role
+      }
+    });
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 
