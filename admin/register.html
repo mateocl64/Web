@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro - Movexa Admin</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="login-page">
+  <div class="login-container">
+    <div class="login-box">
+      <div class="login-header">
+        <i class="fas fa-user-plus"></i>
+        <h1>Registro</h1>
+        <p>Crear nueva cuenta de administrador</p>
+      </div>
+      
+      <form id="registerForm" class="login-form">
+        <div class="form-group">
+          <label for="username">
+            <i class="fas fa-user"></i> Usuario
+          </label>
+          <input type="text" id="username" name="username" required autocomplete="username" minlength="3">
+          <small>Mínimo 3 caracteres</small>
+        </div>
+        
+        <div class="form-group">
+          <label for="email">
+            <i class="fas fa-envelope"></i> Email
+          </label>
+          <input type="email" id="email" name="email" required autocomplete="email">
+        </div>
+        
+        <div class="form-group">
+          <label for="password">
+            <i class="fas fa-lock"></i> Contraseña
+          </label>
+          <input type="password" id="password" name="password" required autocomplete="new-password" minlength="6">
+          <small>Mínimo 6 caracteres</small>
+        </div>
+        
+        <div class="form-group">
+          <label for="confirmPassword">
+            <i class="fas fa-lock"></i> Confirmar Contraseña
+          </label>
+          <input type="password" id="confirmPassword" name="confirmPassword" required autocomplete="new-password" minlength="6">
+        </div>
+        
+        <button type="submit" class="btn-login">
+          <i class="fas fa-user-plus"></i> Registrarse
+        </button>
+      </form>
+      
+      <div id="errorMessage" class="error-message" style="display: none;"></div>
+      
+      <div style="text-align: center; margin-top: 20px;">
+        <p style="color: #666;">¿Ya tienes una cuenta? <a href="index.html" style="color: #667eea; text-decoration: none; font-weight: 500;">Iniciar Sesión</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = window.location.origin;
+
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const username = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const errorMessage = document.getElementById('errorMessage');
+      
+      // Hide previous error
+      errorMessage.style.display = 'none';
+      
+      // Validate username length
+      if (username.length < 3) {
+        errorMessage.textContent = 'El usuario debe tener al menos 3 caracteres';
+        errorMessage.style.display = 'block';
+        return;
+      }
+      
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        errorMessage.textContent = 'El formato del email no es válido';
+        errorMessage.style.display = 'block';
+        return;
+      }
+      
+      // Validate password length
+      if (password.length < 6) {
+        errorMessage.textContent = 'La contraseña debe tener al menos 6 caracteres';
+        errorMessage.style.display = 'block';
+        return;
+      }
+      
+      // Validate passwords match
+      if (password !== confirmPassword) {
+        errorMessage.textContent = 'Las contraseñas no coinciden';
+        errorMessage.style.display = 'block';
+        return;
+      }
+      
+      try {
+        const response = await fetch(`${API_URL}/api/auth/register`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username, email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          // Show success message
+          alert('¡Registro exitoso! Ahora puedes iniciar sesión.');
+          
+          // Redirect to login page
+          window.location.href = 'index.html';
+        } else {
+          errorMessage.textContent = data.message || 'Error en el registro';
+          errorMessage.style.display = 'block';
+        }
+      } catch (error) {
+        console.error('Registration error:', error);
+        errorMessage.textContent = 'Error al conectar con el servidor';
+        errorMessage.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>

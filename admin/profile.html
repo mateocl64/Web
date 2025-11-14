@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Perfil - Movexa Admin</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div class="admin-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2><i class="fas fa-shield-alt"></i> Movexa Admin</h2>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html">
+          <i class="fas fa-home"></i> Dashboard
+        </a>
+        <a href="services.html">
+          <i class="fas fa-cogs"></i> Servicios
+        </a>
+        <a href="content.html">
+          <i class="fas fa-edit"></i> Contenido
+        </a>
+        <a href="messages.html">
+          <i class="fas fa-envelope"></i> Mensajes
+        </a>
+        <a href="profile.html" class="active">
+          <i class="fas fa-user-circle"></i> Mi Perfil
+        </a>
+        <a href="#" onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+        </a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <header class="top-bar">
+        <h1>Mi Perfil</h1>
+        <div class="user-info">
+          <span id="userName"></span>
+          <i class="fas fa-user-circle"></i>
+        </div>
+      </header>
+
+      <div class="content">
+        <div class="dashboard-grid">
+          <!-- User Information Card -->
+          <div class="dashboard-card">
+            <h2><i class="fas fa-user"></i> Información del Usuario</h2>
+            <div id="userInfoDisplay" style="margin-top: 20px;">
+              <div style="margin-bottom: 15px;">
+                <strong style="color: #667eea;"><i class="fas fa-id-badge"></i> Usuario:</strong>
+                <p id="displayUsername" style="margin: 5px 0 0 25px; color: #555;">-</p>
+              </div>
+              <div style="margin-bottom: 15px;">
+                <strong style="color: #667eea;"><i class="fas fa-envelope"></i> Email:</strong>
+                <p id="displayEmail" style="margin: 5px 0 0 25px; color: #555;">-</p>
+              </div>
+              <div style="margin-bottom: 15px;">
+                <strong style="color: #667eea;"><i class="fas fa-shield-alt"></i> Rol:</strong>
+                <p id="displayRole" style="margin: 5px 0 0 25px; color: #555;">-</p>
+              </div>
+              <div style="margin-bottom: 15px;">
+                <strong style="color: #667eea;"><i class="fas fa-calendar"></i> Fecha de Creación:</strong>
+                <p id="displayCreatedAt" style="margin: 5px 0 0 25px; color: #555;">-</p>
+              </div>
+              <div style="margin-bottom: 15px;">
+                <strong style="color: #667eea;"><i class="fas fa-clock"></i> Último Login:</strong>
+                <p id="displayLastLogin" style="margin: 5px 0 0 25px; color: #555;">-</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Edit Profile Card -->
+          <div class="dashboard-card">
+            <h2><i class="fas fa-edit"></i> Editar Perfil</h2>
+            <form id="updateProfileForm" class="content-form" style="margin-top: 20px;">
+              <div class="form-group">
+                <label for="newUsername">
+                  <i class="fas fa-user"></i> Nuevo Usuario
+                </label>
+                <input type="text" id="newUsername" name="newUsername" placeholder="Dejar vacío para no cambiar" minlength="3">
+                <small>Mínimo 3 caracteres</small>
+              </div>
+              
+              <div class="form-group">
+                <label for="newEmail">
+                  <i class="fas fa-envelope"></i> Nuevo Email
+                </label>
+                <input type="email" id="newEmail" name="newEmail" placeholder="Dejar vacío para no cambiar">
+              </div>
+              
+              <button type="submit" class="btn-primary">
+                <i class="fas fa-save"></i> Actualizar Perfil
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Change Password Card -->
+        <div class="content-card" style="margin-top: 20px;">
+          <h2><i class="fas fa-key"></i> Cambiar Contraseña</h2>
+          <form id="changePasswordForm" class="content-form" style="margin-top: 20px; max-width: 600px;">
+            <div class="form-group">
+              <label for="currentPassword">
+                <i class="fas fa-lock"></i> Contraseña Actual
+              </label>
+              <input type="password" id="currentPassword" name="currentPassword" required autocomplete="current-password">
+            </div>
+            
+            <div class="form-group">
+              <label for="newPassword">
+                <i class="fas fa-lock"></i> Nueva Contraseña
+              </label>
+              <input type="password" id="newPassword" name="newPassword" required autocomplete="new-password" minlength="6">
+              <small>Mínimo 6 caracteres</small>
+            </div>
+            
+            <div class="form-group">
+              <label for="confirmNewPassword">
+                <i class="fas fa-lock"></i> Confirmar Nueva Contraseña
+              </label>
+              <input type="password" id="confirmNewPassword" name="confirmNewPassword" required autocomplete="new-password" minlength="6">
+            </div>
+            
+            <button type="submit" class="btn-primary">
+              <i class="fas fa-key"></i> Cambiar Contraseña
+            </button>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/admin.js"></script>
+  <script>
+    // Load user profile data
+    async function loadProfile() {
+      try {
+        const response = await fetchWithAuth('/api/profile');
+        
+        if (response.ok) {
+          const userData = await response.json();
+          
+          // Display user information
+          document.getElementById('displayUsername').textContent = userData.username;
+          document.getElementById('displayEmail').textContent = userData.email;
+          document.getElementById('displayRole').textContent = userData.role.charAt(0).toUpperCase() + userData.role.slice(1);
+          document.getElementById('displayCreatedAt').textContent = formatDate(userData.createdAt);
+          document.getElementById('displayLastLogin').textContent = formatDate(userData.lastLogin);
+          
+          // Set placeholders
+          document.getElementById('newUsername').placeholder = userData.username;
+          document.getElementById('newEmail').placeholder = userData.email;
+        } else {
+          showNotification('Error al cargar el perfil', 'error');
+        }
+      } catch (error) {
+        console.error('Error loading profile:', error);
+        showNotification('Error al cargar el perfil', 'error');
+      }
+    }
+
+    // Handle profile update
+    document.getElementById('updateProfileForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const newUsername = document.getElementById('newUsername').value.trim();
+      const newEmail = document.getElementById('newEmail').value.trim();
+      
+      // Check if at least one field is filled
+      if (!newUsername && !newEmail) {
+        showNotification('Debes proporcionar al menos un campo para actualizar', 'error');
+        return;
+      }
+      
+      // Validate username length if provided
+      if (newUsername && newUsername.length < 3) {
+        showNotification('El usuario debe tener al menos 3 caracteres', 'error');
+        return;
+      }
+      
+      // Validate email format if provided
+      if (newEmail) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(newEmail)) {
+          showNotification('El formato del email no es válido', 'error');
+          return;
+        }
+      }
+      
+      const updateData = {};
+      if (newUsername) updateData.username = newUsername;
+      if (newEmail) updateData.email = newEmail;
+      
+      try {
+        const response = await fetchWithAuth('/api/profile', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(updateData)
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          showNotification('Perfil actualizado exitosamente', 'success');
+          
+          // Update localStorage if username changed
+          if (newUsername) {
+            const user = JSON.parse(localStorage.getItem('user'));
+            user.username = data.user.username;
+            localStorage.setItem('user', JSON.stringify(user));
+          }
+          
+          // Reload profile data
+          await loadProfile();
+          
+          // Clear form
+          document.getElementById('updateProfileForm').reset();
+        } else {
+          showNotification(data.message || 'Error al actualizar perfil', 'error');
+        }
+      } catch (error) {
+        console.error('Update profile error:', error);
+        showNotification('Error al actualizar perfil', 'error');
+      }
+    });
+
+    // Handle password change
+    document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const currentPassword = document.getElementById('currentPassword').value;
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+      
+      // Validate password length
+      if (newPassword.length < 6) {
+        showNotification('La nueva contraseña debe tener al menos 6 caracteres', 'error');
+        return;
+      }
+      
+      // Validate passwords match
+      if (newPassword !== confirmNewPassword) {
+        showNotification('Las contraseñas no coinciden', 'error');
+        return;
+      }
+      
+      try {
+        const response = await fetchWithAuth('/api/profile/password', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ currentPassword, newPassword })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          showNotification('Contraseña cambiada exitosamente', 'success');
+          
+          // Clear form
+          document.getElementById('changePasswordForm').reset();
+        } else {
+          showNotification(data.message || 'Error al cambiar contraseña', 'error');
+        }
+      } catch (error) {
+        console.error('Change password error:', error);
+        showNotification('Error al cambiar contraseña', 'error');
+      }
+    });
+
+    // Load profile on page load
+    loadProfile();
+  </script>
+</body>
+</html>
