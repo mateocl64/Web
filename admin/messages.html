@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mensajes - Movexa Admin</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div class="admin-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2><i class="fas fa-shield-alt"></i> Movexa Admin</h2>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html">
+          <i class="fas fa-home"></i> Dashboard
+        </a>
+        <a href="services.html">
+          <i class="fas fa-cogs"></i> Servicios
+        </a>
+        <a href="content.html">
+          <i class="fas fa-edit"></i> Contenido
+        </a>
+        <a href="messages.html" class="active">
+          <i class="fas fa-envelope"></i> Mensajes
+        </a>
+        <a href="#" onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+        </a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <header class="top-bar">
+        <h1>Mensajes de Contacto</h1>
+        <div class="user-info">
+          <span id="userName"></span>
+          <i class="fas fa-user-circle"></i>
+        </div>
+      </header>
+
+      <div class="content">
+        <div class="info-card">
+          <i class="fas fa-info-circle"></i>
+          <div>
+            <h3>Integración con FormSubmit</h3>
+            <p>Los mensajes se envían directamente a <strong>msas@movexa.com</strong> usando FormSubmit. Esta página está preparada para futuras integraciones con bases de datos para almacenar mensajes.</p>
+            <p>Los mensajes recibidos llegarán al correo electrónico configurado en el formulario de contacto del sitio web.</p>
+          </div>
+        </div>
+
+        <div class="messages-placeholder">
+          <i class="fas fa-envelope-open-text"></i>
+          <h2>Buzón de Mensajes</h2>
+          <p>Actualmente los mensajes se envían directamente por email.</p>
+          <p>Para implementar un sistema de mensajes en el panel, puedes:</p>
+          <ul>
+            <li>Configurar un webhook en FormSubmit para enviar mensajes a tu API</li>
+            <li>Crear un endpoint POST /api/messages para recibir mensajes</li>
+            <li>Almacenar mensajes en backend/data/messages.json</li>
+            <li>Mostrar los mensajes en esta página</li>
+          </ul>
+          <a href="mailto:msas@movexa.com" class="btn-primary">
+            <i class="fas fa-external-link-alt"></i> Abrir Email
+          </a>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/admin.js"></script>
+</body>
+</html>

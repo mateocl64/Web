@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Servicios - Movexa Admin</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <div class="admin-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2><i class="fas fa-shield-alt"></i> Movexa Admin</h2>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html">
+          <i class="fas fa-home"></i> Dashboard
+        </a>
+        <a href="services.html" class="active">
+          <i class="fas fa-cogs"></i> Servicios
+        </a>
+        <a href="content.html">
+          <i class="fas fa-edit"></i> Contenido
+        </a>
+        <a href="messages.html">
+          <i class="fas fa-envelope"></i> Mensajes
+        </a>
+        <a href="#" onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+        </a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <header class="top-bar">
+        <h1>Gestión de Servicios</h1>
+        <div class="user-info">
+          <span id="userName"></span>
+          <i class="fas fa-user-circle"></i>
+        </div>
+      </header>
+
+      <div class="content">
+        <div class="actions-bar">
+          <button class="btn-primary" onclick="openServiceModal()">
+            <i class="fas fa-plus"></i> Nuevo Servicio
+          </button>
+        </div>
+
+        <div id="servicesList" class="services-grid">
+          <!-- Services will be loaded here -->
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Service Modal -->
+  <div id="serviceModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Nuevo Servicio</h2>
+        <button class="modal-close" onclick="closeServiceModal()">&times;</button>
+      </div>
+      <form id="serviceForm">
+        <input type="hidden" id="serviceId">
+        
+        <div class="form-group">
+          <label for="title">Título *</label>
+          <input type="text" id="title" name="title" required>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Descripción *</label>
+          <textarea id="description" name="description" rows="3" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="details">Detalles</label>
+          <textarea id="details" name="details" rows="4"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="image">Imagen (ruta)</label>
+          <input type="text" id="image" name="image" placeholder="img/servicio.jpg">
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="closeServiceModal()">Cancelar</button>
+          <button type="submit" class="btn-primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/admin.js"></script>
+  <script>
+    let services = [];
+
+    async function loadServices() {
+      try {
+        const response = await fetchWithAuth('/api/services');
+        if (response.ok) {
+          services = await response.json();
+          renderServices();
+        } else {
+          showNotification('Error al cargar servicios', 'error');
+        }
+      } catch (error) {
+        console.error('Error loading services:', error);
+        showNotification('Error al cargar servicios', 'error');
+      }
+    }
+
+    function renderServices() {
+      const servicesList = document.getElementById('servicesList');
+      
+      if (services.length === 0) {
+        servicesList.innerHTML = '<p class="empty-state">No hay servicios registrados. Crea uno nuevo para comenzar.</p>';
+        return;
+      }
+
+      servicesList.innerHTML = services.map(service => `
+        <div class="service-card">
+          <div class="service-card-header">
+            <h3>${service.title}</h3>
+          </div>
+          <div class="service-card-body">
+            <p>${service.description}</p>
+            ${service.image ? `<img src="../${service.image}" alt="${service.title}" onerror="this.style.display='none'">` : ''}
+          </div>
+          <div class="service-card-actions">
+            <button class="btn-icon" onclick="editService(${service.id})" title="Editar">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn-icon danger" onclick="deleteService(${service.id})" title="Eliminar">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openServiceModal(service = null) {
+      const modal = document.getElementById('serviceModal');
+      const form = document.getElementById('serviceForm');
+      const modalTitle = document.getElementById('modalTitle');
+      
+      form.reset();
+      
+      if (service) {
+        modalTitle.textContent = 'Editar Servicio';
+        document.getElementById('serviceId').value = service.id;
+        document.getElementById('title').value = service.title;
+        document.getElementById('description').value = service.description;
+        document.getElementById('details').value = service.details || '';
+        document.getElementById('image').value = service.image || '';
+      } else {
+        modalTitle.textContent = 'Nuevo Servicio';
+        document.getElementById('serviceId').value = '';
+      }
+      
+      modal.style.display = 'flex';
+    }
+
+    function closeServiceModal() {
+      document.getElementById('serviceModal').style.display = 'none';
+    }
+
+    function editService(id) {
+      const service = services.find(s => s.id === id);
+      if (service) {
+        openServiceModal(service);
+      }
+    }
+
+    async function deleteService(id) {
+      if (!confirm('¿Estás seguro de que deseas eliminar este servicio?')) {
+        return;
+      }
+
+      try {
+        const response = await fetchWithAuth(`/api/services/${id}`, {
+          method: 'DELETE'
+        });
+
+        if (response.ok) {
+          showNotification('Servicio eliminado correctamente', 'success');
+          loadServices();
+        } else {
+          showNotification('Error al eliminar el servicio', 'error');
+        }
+      } catch (error) {
+        console.error('Error deleting service:', error);
+        showNotification('Error al eliminar el servicio', 'error');
+      }
+    }
+
+    document.getElementById('serviceForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const serviceId = document.getElementById('serviceId').value;
+      const serviceData = {
+        title: document.getElementById('title').value,
+        description: document.getElementById('description').value,
+        details: document.getElementById('details').value,
+        image: document.getElementById('image').value
+      };
+
+      try {
+        const url = serviceId ? `/api/services/${serviceId}` : '/api/services';
+        const method = serviceId ? 'PUT' : 'POST';
+        
+        const response = await fetchWithAuth(url, {
+          method,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(serviceData)
+        });
+
+        if (response.ok) {
+          showNotification(`Servicio ${serviceId ? 'actualizado' : 'creado'} correctamente`, 'success');
+          closeServiceModal();
+          loadServices();
+        } else {
+          showNotification('Error al guardar el servicio', 'error');
+        }
+      } catch (error) {
+        console.error('Error saving service:', error);
+        showNotification('Error al guardar el servicio', 'error');
+      }
+    });
+
+    // Close modal on outside click
+    window.onclick = function(event) {
+      const modal = document.getElementById('serviceModal');
+      if (event.target === modal) {
+        closeServiceModal();
+      }
+    };
+
+    loadServices();
+  </script>
+</body>
+</html>
