@@ -1,53 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const fs = require('fs');
-const path = require('path');
 const authMiddleware = require('../middleware/auth');
-
-const servicesFilePath = path.join(__dirname, '../data/services.json');
-
-// Initialize services file if it doesn't exist
-const initializeServices = () => {
-  if (!fs.existsSync(servicesFilePath)) {
-    const services = [
-      {
-        id: 1,
-        title: 'Prótesis Personalizadas',
-        description: 'Diseñadas para adaptarse perfectamente a cada paciente.',
-        image: 'img/protesiscustom.jpg',
-        details: 'Nuestras prótesis personalizadas utilizan tecnología de punta para garantizar comodidad y funcionalidad óptima.',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      },
-      {
-        id: 2,
-        title: 'Rehabilitación',
-        description: 'Acompañamiento integral en el proceso de adaptación.',
-        image: 'img/rehab.jpg',
-        details: 'Programa de rehabilitación completo con profesionales especializados para asegurar una adaptación exitosa.',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      },
-      {
-        id: 3,
-        title: 'Asesoramiento',
-        description: 'Te guiamos para que tomes la mejor decisión en tu tratamiento.',
-        image: 'img/guía.jpg',
-        details: 'Asesoría personalizada para ayudarte a elegir la mejor solución protésica según tus necesidades.',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }
-    ];
-    fs.writeFileSync(servicesFilePath, JSON.stringify(services, null, 2));
-  }
-};
-
-initializeServices();
+const Service = require('../models/Service');
 
 // Get all services (public)
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const services = JSON.parse(fs.readFileSync(servicesFilePath, 'utf8'));
+    const services = await Service.find({ active: true }).populate('createdBy', 'username');
     res.json(services);
   } catch (error) {
     console.error('Error reading services:', error);
@@ -56,10 +15,9 @@ router.get('/', (req, res) => {
 });
 
 // Get single service (public)
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const services = JSON.parse(fs.readFileSync(servicesFilePath, 'utf8'));
-    const service = services.find(s => s.id === parseInt(req.params.id));
+    const service = await Service.findById(req.params.id).populate('createdBy', 'username');
     
     if (!service) {
       return res.status(404).json({ message: 'Service not found' });
@@ -73,63 +31,63 @@ router.get('/:id', (req, res) => {
 });
 
 // Create service (protected)
-router.post('/', authMiddleware, (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
   try {
-    const services = JSON.parse(fs.readFileSync(servicesFilePath, 'utf8'));
-    const newService = {
-      id: services.length > 0 ? Math.max(...services.map(s => s.id)) + 1 : 1,
+    const newService = new Service({
       ...req.body,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
+      createdBy: req.user.id
+    });
     
-    services.push(newService);
-    fs.writeFileSync(servicesFilePath, JSON.stringify(services, null, 2));
+    await newService.save();
     
     res.status(201).json(newService);
   } catch (error) {
     console.error('Error creating service:', error);
+    
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ message: messages.join(', ') });
+    }
+    
     res.status(500).json({ message: 'Error creating service' });
   }
 });
 
 // Update service (protected)
-router.put('/:id', authMiddleware, (req, res) => {
+router.put('/:id', authMiddleware, async (req, res) => {
   try {
-    const services = JSON.parse(fs.readFileSync(servicesFilePath, 'utf8'));
-    const index = services.findIndex(s => s.id === parseInt(req.params.id));
+    const service = await Service.findByIdAndUpdate(
+      req.params.id,
+      { ...req.body },
+      { new: true, runValidators: true }
+    );
     
-    if (index === -1) {
+    if (!service) {
       return res.status(404).json({ message: 'Service not found' });
     }
     
-    services[index] = {
-      ...services[index],
-      ...req.body,
-      id: services[index].id,
-      createdAt: services[index].createdAt,
-      updatedAt: new Date().toISOString()
-    };
-    
-    fs.writeFileSync(servicesFilePath, JSON.stringify(services, null, 2));
-    res.json(services[index]);
+    res.json(service);
   } catch (error) {
     console.error('Error updating service:', error);
+    
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ message: messages.join(', ') });
+    }
+    
     res.status(500).json({ message: 'Error updating service' });
   }
 });
 
 // Delete service (protected)
-router.delete('/:id', authMiddleware, (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => {
   try {
-    const services = JSON.parse(fs.readFileSync(servicesFilePath, 'utf8'));
-    const filteredServices = services.filter(s => s.id !== parseInt(req.params.id));
+    const service = await Service.findByIdAndDelete(req.params.id);
     
-    if (services.length === filteredServices.length) {
+    if (!service) {
       return res.status(404).json({ message: 'Service not found' });
     }
     
-    fs.writeFileSync(servicesFilePath, JSON.stringify(filteredServices, null, 2));
     res.json({ message: 'Service deleted successfully' });
   } catch (error) {
     console.error('Error deleting service:', error);
