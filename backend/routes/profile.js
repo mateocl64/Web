@@ -1,31 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
-const fs = require('fs');
-const path = require('path');
 const authMiddleware = require('../middleware/auth');
-
-const usersFilePath = path.join(__dirname, '../data/users.json');
+const User = require('../models/User');
 
 // Get current user profile
-router.get('/', authMiddleware, (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
   try {
-    const users = JSON.parse(fs.readFileSync(usersFilePath, 'utf8'));
-    const user = users.find(u => u.id === req.user.id);
+    const user = await User.findById(req.user.id).select('-password');
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Return user data without password
-    res.json({
-      id: user.id,
-      username: user.username,
-      email: user.email,
-      role: user.role,
-      createdAt: user.createdAt,
-      lastLogin: user.lastLogin
-    });
+    res.json(user);
   } catch (error) {
     console.error('Get profile error:', error);
     res.status(500).json({ message: 'Internal server error' });
@@ -33,7 +21,7 @@ router.get('/', authMiddleware, (req, res) => {
 });
 
 // Update user profile
-router.put('/', authMiddleware, (req, res) => {
+router.put('/', authMiddleware, async (req, res) => {
   const { username, email } = req.body;
 
   // Validate that at least one field is provided
@@ -42,10 +30,9 @@ router.put('/', authMiddleware, (req, res) => {
   }
 
   try {
-    const users = JSON.parse(fs.readFileSync(usersFilePath, 'utf8'));
-    const userIndex = users.findIndex(u => u.id === req.user.id);
+    const user = await User.findById(req.user.id);
 
-    if (userIndex === -1) {
+    if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
@@ -56,12 +43,12 @@ router.put('/', authMiddleware, (req, res) => {
       }
 
       // Check if username is already taken by another user
-      const existingUser = users.find(u => u.username === username && u.id !== req.user.id);
+      const existingUser = await User.findOne({ username, _id: { $ne: req.user.id } });
       if (existingUser) {
         return res.status(400).json({ message: 'Username already exists' });
       }
 
-      users[userIndex].username = username;
+      user.username = username;
     }
 
     // Validate email if provided
@@ -72,27 +59,25 @@ router.put('/', authMiddleware, (req, res) => {
       }
 
       // Check if email is already taken by another user
-      const existingUser = users.find(u => u.email === email && u.id !== req.user.id);
+      const existingUser = await User.findOne({ email, _id: { $ne: req.user.id } });
       if (existingUser) {
         return res.status(400).json({ message: 'Email already exists' });
       }
 
-      users[userIndex].email = email;
+      user.email = email;
     }
 
-    // Save changes
-    fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2));
+    await user.save();
 
-    // Return updated user data without password
     res.json({
       message: 'Profile updated successfully',
       user: {
-        id: users[userIndex].id,
-        username: users[userIndex].username,
-        email: users[userIndex].email,
-        role: users[userIndex].role,
-        createdAt: users[userIndex].createdAt,
-        lastLogin: users[userIndex].lastLogin
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        createdAt: user.createdAt,
+        lastLogin: user.lastLogin
       }
     });
   } catch (error) {
@@ -102,7 +87,7 @@ router.put('/', authMiddleware, (req, res) => {
 });
 
 // Change password
-router.put('/password', authMiddleware, (req, res) => {
+router.put('/password', authMiddleware, async (req, res) => {
   const { currentPassword, newPassword } = req.body;
 
   // Validate required fields
@@ -116,27 +101,21 @@ router.put('/password', authMiddleware, (req, res) => {
   }
 
   try {
-    const users = JSON.parse(fs.readFileSync(usersFilePath, 'utf8'));
-    const userIndex = users.findIndex(u => u.id === req.user.id);
+    const user = await User.findById(req.user.id);
 
-    if (userIndex === -1) {
+    if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const user = users[userIndex];
-
     // Verify current password
-    const isValidPassword = bcrypt.compareSync(currentPassword, user.password);
+    const isValidPassword = await user.comparePassword(currentPassword);
     if (!isValidPassword) {
       return res.status(401).json({ message: 'Current password is incorrect' });
     }
 
-    // Hash new password
-    const hashedPassword = bcrypt.hashSync(newPassword, 10);
-    users[userIndex].password = hashedPassword;
-
-    // Save changes
-    fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2));
+    // Update password (will be hashed by pre-save hook)
+    user.password = newPassword;
+    await user.save();
 
     res.json({ message: 'Password changed successfully' });
   } catch (error) {

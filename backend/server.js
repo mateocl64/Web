@@ -5,6 +5,9 @@ const path = require('path');
 const fs = require('fs');
 require('dotenv').config();
 
+// Import MongoDB connection
+const connectDB = require('./config/database');
+
 const authRoutes = require('./routes/auth');
 const servicesRoutes = require('./routes/services');
 const contentRoutes = require('./routes/content');
@@ -13,7 +16,10 @@ const profileRoutes = require('./routes/profile');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Ensure data directory exists
+// Connect to MongoDB
+connectDB();
+
+// Ensure data directory exists (for backup)
 const dataDir = path.join(__dirname, 'data');
 if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
@@ -37,7 +43,8 @@ app.use('/api/profile', profileRoutes);
 app.get('/api', (req, res) => {
   res.json({
     message: 'Movexa Admin Panel API',
-    version: '1.0.0',
+    version: '2.0.0',
+    database: 'MongoDB Atlas',
     endpoints: {
       auth: {
         login: 'POST /api/auth/login',
@@ -62,6 +69,15 @@ app.get('/api', (req, res) => {
         updateSection: 'PUT /api/content/:section (auth required)'
       }
     }
+  });
+});
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'OK',
+    database: 'MongoDB',
+    timestamp: new Date().toISOString()
   });
 });
 
