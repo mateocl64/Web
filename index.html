@@ -3,18 +3,44 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Movexa</title>
+  
+  <!-- SEO Meta Tags -->
+  <title>Movexa - Prótesis Médicas Modernas y Confiables | Medellín, Colombia</title>
+  <meta name="description" content="Movexa: Especialistas en soluciones de prótesis personalizadas, rehabilitación y asesoramiento médico. Tecnología moderna para mejorar tu calidad de vida." />
+  <meta name="keywords" content="prótesis, prótesis médicas, rehabilitación, asesoramiento médico, Medellín, Colombia, Movexa" />
+  <meta name="author" content="Movexa SA" />
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Movexa - Prótesis Médicas Modernas" />
+  <meta property="og:description" content="Soluciones protésicas de última generación con acompañamiento profesional." />
+  <meta property="og:url" content="https://movexa.com" />
+  
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Movexa - Prótesis Médicas Modernas" />
+  <meta name="twitter:description" content="Soluciones protésicas de última generación con acompañamiento profesional." />
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="img/favicon.png" />
+  
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="estilos.css" />
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
 <body>
 
   <!-- Header -->
-   <!-- Font Awesome -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
   <header>
     <div class="contenedor">
       <h1 class="logo"><a href="#inicio">Movexa</a></h1>
+      <button class="menu-toggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
       <nav>
         <ul class="menu">
           <li><a href="#inicio">Inicio</a></li>
@@ -26,44 +52,41 @@
     </div>
   </header>
 
-  <!-- Inicio -->
+  <!-- Hero Section -->
   <section id="inicio" class="hero">
     <div class="texto-hero">
-      <h2>Bienvenidos a Movexa</h2>
-      <p>Especialistas en soluciones de prótesis modernas, humanas y confiables.</p>
-      <img src="img/protesis.jpg" alt="Prótesis moderna">
+      <h2 class="hero-title">Bienvenidos a Movexa</h2>
+      <p class="hero-subtitle">Especialistas en soluciones de prótesis modernas, humanas y confiables.</p>
+      <a href="#servicios" class="hero-cta">Conocer Servicios</a>
+      <img src="img/protesis.jpg" alt="Prótesis moderna" class="hero-image">
     </div>
   </section>
 
-  <!-- Nosotros -->
+  <!-- About Section -->
   <section id="nosotros" class="seccion">
     <div class="contenedor">
       <h2>Nosotros</h2>
-      <p>Somos un equipo de profesionales comprometidos con mejorar la calidad de vida de las personas a través de soluciones protésicas de última generación.</p>
-      <img src="img/nosotros.png" alt="Equipo profesional">
-      <blockquote>“Restaurar movilidad es devolver libertad.”</blockquote>
+      <div class="about-content">
+        <div class="about-text">
+          <p class="about-description">Somos un equipo de profesionales comprometidos con mejorar la calidad de vida de las personas a través de soluciones protésicas de última generación.</p>
+          <blockquote class="quote-text">"Restaurar movilidad es devolver libertad."</blockquote>
+        </div>
+        <div class="about-image-container">
+          <img src="img/nosotros.png" alt="Equipo profesional Movexa" class="about-image fade-in">
+        </div>
+      </div>
     </div>
   </section>
 
-  <!-- Servicios -->
+  <!-- Services Section - Dynamic Content -->
   <section id="servicios" class="seccion fondo-claro">
     <div class="contenedor">
       <h2>Nuestros Servicios</h2>
-      <div class="contenedor-servicios">
-        <div class="servicio">
-          <h3>Prótesis Personalizadas</h3>
-          <p>Diseñadas para adaptarse perfectamente a cada paciente.</p>
-          <img src="img/protesiscustom.jpg" alt="Prótesis personalizada">
-        </div>
-        <div class="servicio">
-          <h3>Rehabilitación</h3>
-          <p>Acompañamiento integral en el proceso de adaptación.</p>
-          <img src="img/rehab.jpg" alt="Rehabilitación">
-        </div>
-        <div class="servicio">
-          <h3>Asesoramiento</h3>
-          <p>Te guiamos para que tomes la mejor decisión en tu tratamiento.</p>
-          <img src="img/guía.jpg" alt="Asesoría médica">
+      <div class="contenedor-servicios" id="servicios-container">
+        <!-- Services will be loaded dynamically from MongoDB -->
+        <div class="loading-spinner">
+          <div class="spinner"></div>
+          <p>Cargando servicios...</p>
         </div>
       </div>
     </div>
@@ -76,89 +99,131 @@
       <div id="modal-texto"></div>
       <img id="modal-img" src="" alt="Imagen ampliada">
     </div>
-   </div>
-
-  <!-- Contacto -->
-<section id="contacto" class="seccion">
-  <div class="contenedor">
-    <img src="img/Contactanos.png" alt="Contactanos">
-    <h2>Contacto</h2>
-    <p>¿Tienes preguntas? Envíanos un mensaje directamente.</p>
-
-    <form action="https://formsubmit.co/msas@movexa.com" method="POST" class="formulario-contacto">
-      <!-- CAMPO OCULTO para evitar SPAM -->
-      <input type="hidden" name="_captcha" value="false">
-
-      <input type="text" name="nombre" placeholder="Tu nombre" required>
-      <input type="email" name="email" placeholder="Tu correo electrónico" required>
-      <textarea name="mensaje" placeholder="Escribe tu mensaje aquí..." rows="5" required></textarea>
-
-      <button type="submit">Enviar Mensaje</button>
-    </form>
-
-    <blockquote>“Tu bienestar es nuestra prioridad.”</blockquote>
   </div>
-</section>
 
-  <!-- Footer -->
-  <footer>
-    <p>&copy; 2025 Movexa SA. Todos los derechos reservados.</p>
-  </footer>
-  <!-- Footer -->
-<footer class="footer">
-  <div class="contenedor footer-contenido">
-    <div class="footer-info">
-      <p>
-        <a href="https://www.google.com/maps?q=Medellín, Colombia" target="_blank">
-          <i class="fas fa-map-marker-alt"></i> Medellín, Colombia
-        </a>
-      </p>
-      <p>
-        <a href="mailto:msas@movexa.com">
-          <i class="fas fa-envelope"></i> msas@movexa.com
-        </a>
-      </p>
-      <p>
-        <a href="https://wa.me/573001234567" target="_blank">
-          <i class="fab fa-whatsapp"></i> +57 300 123 4567
-        </a>
-      </p>
-      <p>
-        <i class="fas fa-clock"></i> Lunes a Sábado: 8:00 a.m. - 8:00 p.m.
-      </p>
+  <!-- Contact Section -->
+  <section id="contacto" class="seccion">
+    <div class="contenedor">
+      <img src="img/Contactanos.png" alt="Contactanos" class="fade-in">
+      <h2>Contacto</h2>
+      <p>¿Tienes preguntas? Envíanos un mensaje directamente.</p>
+
+      <form action="https://formsubmit.co/msas@movexa.com" method="POST" class="formulario-contacto">
+        <!-- Hidden field to prevent SPAM -->
+        <input type="hidden" name="_captcha" value="false">
+
+        <input type="text" name="nombre" placeholder="Tu nombre" required>
+        <input type="email" name="email" placeholder="Tu correo electrónico" required>
+        <textarea name="mensaje" placeholder="Escribe tu mensaje aquí..." rows="5" required></textarea>
+
+        <button type="submit">Enviar Mensaje</button>
+      </form>
+
+      <blockquote class="quote-text">"Tu bienestar es nuestra prioridad."</blockquote>
     </div>
-  </div>
-</footer>
+  </section>
 
-<script>
-  const modal = document.getElementById("modal");
-  const modalTexto = document.getElementById("modal-texto");
-  const modalImg = document.getElementById("modal-img");
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="contenedor">
+      <div class="footer-content">
+        <!-- Company Info -->
+        <div class="footer-section">
+          <h3>Movexa</h3>
+          <p>Soluciones protésicas de última generación para mejorar tu calidad de vida.</p>
+          <div class="social-links">
+            <a href="https://facebook.com/movexa" target="_blank" rel="noopener" aria-label="Facebook">
+              <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="https://instagram.com/movexa" target="_blank" rel="noopener" aria-label="Instagram">
+              <i class="fab fa-instagram"></i>
+            </a>
+            <a href="https://twitter.com/movexa" target="_blank" rel="noopener" aria-label="Twitter">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a href="https://linkedin.com/company/movexa" target="_blank" rel="noopener" aria-label="LinkedIn">
+              <i class="fab fa-linkedin-in"></i>
+            </a>
+          </div>
+        </div>
 
-  function abrirModal(texto, imagen) {
-    modalTexto.innerHTML = texto;
-    modalImg.src = imagen;
-    modal.style.display = "flex"; // <-- Este punto es importante
-  }
+        <!-- Quick Links -->
+        <div class="footer-section">
+          <h3>Enlaces Rápidos</h3>
+          <p><a href="#inicio">Inicio</a></p>
+          <p><a href="#nosotros">Nosotros</a></p>
+          <p><a href="#servicios">Servicios</a></p>
+          <p><a href="#contacto">Contacto</a></p>
+          <p><a href="/admin">Panel Admin</a></p>
+        </div>
 
-  function cerrarModal() {
-    modal.style.display = "none";
-  }
+        <!-- Contact Info -->
+        <div class="footer-section footer-info">
+          <h3>Contacto</h3>
+          <p>
+            <a href="https://www.google.com/maps?q=Medellín, Colombia" target="_blank" rel="noopener">
+              <i class="fas fa-map-marker-alt"></i> Medellín, Colombia
+            </a>
+          </p>
+          <p>
+            <a href="mailto:msas@movexa.com">
+              <i class="fas fa-envelope"></i> <span class="contact-email">msas@movexa.com</span>
+            </a>
+          </p>
+          <p>
+            <a href="https://wa.me/573001234567" target="_blank" rel="noopener">
+              <i class="fab fa-whatsapp"></i> <span class="contact-phone">+57 300 123 4567</span>
+            </a>
+          </p>
+          <p>
+            <i class="fas fa-clock"></i> <span class="contact-hours">Lunes a Sábado: 8:00 a.m. - 8:00 p.m.</span>
+          </p>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2025 Movexa SA. Todos los derechos reservados.</p>
+      </div>
+    </div>
+  </footer>
 
-  document.querySelectorAll(".servicio").forEach(servicio => {
-    servicio.addEventListener("click", () => {      
-      const titulo = servicio.querySelector("h3").textContent;
-      const desc = servicio.querySelector("p").textContent;
-      const img = servicio.querySelector("img").src;
-      abrirModal(<div><h3>${titulo}</h3><p>${desc}</p></div>, img);
+  <!-- Scripts -->
+  <script src="js/main.js"></script>
+  
+  <!-- Legacy modal script for compatibility -->
+  <script>
+    const modal = document.getElementById("modal");
+    const modalTexto = document.getElementById("modal-texto");
+    const modalImg = document.getElementById("modal-img");
+
+    function abrirModal(texto, imagen) {
+      modalTexto.innerHTML = texto;
+      modalImg.src = imagen;
+      modal.style.display = "flex";
+    }
+
+    function cerrarModal() {
+      modal.style.display = "none";
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      if (event.target == modal) cerrarModal();
+    };
+    
+    // Add click handlers to service cards (after dynamic loading)
+    document.addEventListener('click', function(e) {
+      const servicio = e.target.closest('.servicio');
+      if (servicio && servicio.dataset.serviceId) {
+        const titulo = servicio.querySelector('h3')?.textContent || '';
+        const desc = servicio.querySelector('p')?.textContent || '';
+        const img = servicio.querySelector('img')?.src || '';
+        if (titulo && desc) {
+          abrirModal(`<div><h3>${titulo}</h3><p>${desc}</p></div>`, img);
+        }
+      }
     });
-  });
-
-  window.onclick = function(event) {
-    if (event.target == modal) cerrarModal();
-  };
-</script>
-
+  </script>
 
 </body>
 </html>
