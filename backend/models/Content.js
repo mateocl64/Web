@@ -1,43 +1,60 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/database');
 
-const contentSchema = new mongoose.Schema({
+const Content = sequelize.define('Content', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
   section: {
-    type: String,
-    required: [true, 'Section name is required'],
+    type: DataTypes.STRING(50),
+    allowNull: false,
     unique: true,
-    trim: true,
+    validate: {
+      notEmpty: { msg: 'Section name is required' }
+    }
   },
   title: {
-    type: String,
-    trim: true,
+    type: DataTypes.STRING(255),
+    allowNull: true
   },
   subtitle: {
-    type: String,
-    trim: true,
+    type: DataTypes.STRING(255),
+    allowNull: true
   },
   text: {
-    type: String,
-    trim: true,
+    type: DataTypes.TEXT,
+    allowNull: true
   },
   buttonText: {
-    type: String,
-    trim: true,
+    type: DataTypes.STRING(100),
+    allowNull: true
   },
   image: {
-    type: String,
-    trim: true,
+    type: DataTypes.STRING(255),
+    allowNull: true
   },
   data: {
-    type: mongoose.Schema.Types.Mixed,
+    type: DataTypes.JSON,
+    allowNull: true
   },
   lastUpdatedBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-  },
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: 'users',
+      key: 'id'
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'SET NULL'
+  }
 }, {
   timestamps: true,
+  tableName: 'contents',
+  indexes: [
+    { unique: true, fields: ['section'] }
+  ]
 });
 
-contentSchema.index({ section: 1 });
-
-module.exports = mongoose.model('Content', contentSchema);
+module.exports = Content;

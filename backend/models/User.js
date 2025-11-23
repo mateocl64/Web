@@ -1,67 +1,90 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
 const bcrypt = require('bcryptjs');
+const { sequelize } = require('../config/database');
 
-const userSchema = new mongoose.Schema({
+const User = sequelize.define('User', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
   username: {
-    type: String,
-    required: [true, 'Username is required'],
+    type: DataTypes.STRING(50),
+    allowNull: false,
     unique: true,
-    trim: true,
-    minlength: [3, 'Username must be at least 3 characters'],
+    validate: {
+      notEmpty: { msg: 'Username is required' },
+      len: {
+        args: [3, 50],
+        msg: 'Username must be between 3 and 50 characters'
+      }
+    }
   },
   email: {
-    type: String,
-    required: [true, 'Email is required'],
+    type: DataTypes.STRING(100),
+    allowNull: false,
     unique: true,
-    lowercase: true,
-    trim: true,
-    match: [/\^\S+@\S+\.\S+$/, 'Please provide a valid email'],
+    validate: {
+      notEmpty: { msg: 'Email is required' },
+      isEmail: { msg: 'Please provide a valid email' }
+    },
+    set(value) {
+      this.setDataValue('email', value.toLowerCase().trim());
+    }
   },
   password: {
-    type: String,
-    required: [true, 'Password is required'],
-    minlength: [6, 'Password must be at least 6 characters'],
+    type: DataTypes.STRING(255),
+    allowNull: false,
+    validate: {
+      notEmpty: { msg: 'Password is required' },
+      len: {
+        args: [6, 255],
+        msg: 'Password must be at least 6 characters'
+      }
+    }
   },
   role: {
-    type: String,
-    enum: ['admin', 'editor'],
-    default: 'editor',
+    type: DataTypes.ENUM('admin', 'editor'),
+    defaultValue: 'editor',
+    allowNull: false
   },
   lastLogin: {
-    type: Date,
-    default: Date.now,
-  },
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
+  }
 }, {
   timestamps: true,
-});
-
-// Índices para búsquedas rápidas
-userSchema.index({ email: 1 });
-userSchema.index({ username: 1 });
-
-// Método para comparar contraseñas
-userSchema.methods.comparePassword = async function(candidatePassword) {
-  return await bcrypt.compare(candidatePassword, this.password);
-};
-
-// Hook pre-save para hashear contraseña solo si es modificada
-userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();
-  
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (error) {
-    next(error);
+  tableName: 'users',
+  indexes: [
+    { fields: ['email'] },
+    { fields: ['username'] }
+  ],
+  hooks: {
+    beforeCreate: async (user) => {
+      if (user.password) {
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(user.password, salt);
+      }
+    },
+    beforeUpdate: async (user) => {
+      if (user.changed('password')) {
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(user.password, salt);
+      }
+    }
   }
 });
 
-// Método para formato de respuesta (ocultar password)
-userSchema.methods.toJSON = function() {
-  const obj = this.toObject();
-  delete obj.password;
-  return obj;
+// Método de instancia para comparar contraseñas
+User.prototype.comparePassword = async function(candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
 };
 
-module.exports = mongoose.model('User', userSchema);
+// Ocultar password en JSON
+User.prototype.toJSON = function() {
+  const values = Object.assign({}, this.get());
+  delete values.password;
+  return values;
+};
+
+module.exports = User;

@@ -1,42 +1,65 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/database');
 
-const serviceSchema = new mongoose.Schema({
+const Service = sequelize.define('Service', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
   title: {
-    type: String,
-    required: [true, 'Service title is required'],
-    trim: true,
-    maxlength: [100, 'Title cannot exceed 100 characters'],
+    type: DataTypes.STRING(100),
+    allowNull: false,
+    validate: {
+      notEmpty: { msg: 'Service title is required' },
+      len: {
+        args: [1, 100],
+        msg: 'Title cannot exceed 100 characters'
+      }
+    }
   },
   description: {
-    type: String,
-    required: [true, 'Service description is required'],
-    trim: true,
-    maxlength: [500, 'Description cannot exceed 500 characters'],
+    type: DataTypes.STRING(500),
+    allowNull: false,
+    validate: {
+      notEmpty: { msg: 'Service description is required' },
+      len: {
+        args: [1, 500],
+        msg: 'Description cannot exceed 500 characters'
+      }
+    }
   },
   icon: {
-    type: String,
-    default: 'fas fa-cog',
+    type: DataTypes.STRING(100),
+    defaultValue: 'fas fa-cog'
   },
   category: {
-    type: String,
-    trim: true,
+    type: DataTypes.STRING(50),
+    allowNull: true
   },
   active: {
-    type: Boolean,
-    default: true,
+    type: DataTypes.BOOLEAN,
+    defaultValue: true
   },
   createdBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-  },
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'users',
+      key: 'id'
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE'
+  }
 }, {
   timestamps: true,
+  tableName: 'services',
+  indexes: [
+    { fields: ['active'] },
+    { fields: ['createdBy'] },
+    { fields: ['title'] },
+    { fields: ['category'] }
+  ]
 });
 
-// Índices
-serviceSchema.index({ active: 1 });
-serviceSchema.index({ createdBy: 1 });
-serviceSchema.index({ title: 'text', description: 'text' });
-
-module.exports = mongoose.model('Service', serviceSchema);
+module.exports = Service;

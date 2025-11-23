@@ -6,19 +6,16 @@ const Content = require('../models/Content');
 // Get all content (public)
 router.get('/', async (req, res) => {
   try {
-    const content = await Content.find();
+    const content = await Content.findAll();
     const contentObj = {};
     content.forEach(item => {
       contentObj[item.section] = {
         title: item.title,
         subtitle: item.subtitle,
-        description: item.description,
+        text: item.text,
+        buttonText: item.buttonText,
         image: item.image,
-        quote: item.quote,
-        email: item.email,
-        phone: item.phone,
-        address: item.address,
-        hours: item.hours,
+        data: item.data,
         updatedAt: item.updatedAt
       };
     });
@@ -32,7 +29,7 @@ router.get('/', async (req, res) => {
 // Get specific section content (public)
 router.get('/:section', async (req, res) => {
   try {
-    const content = await Content.findOne({ section: req.params.section });
+    const content = await Content.findOne({ where: { section: req.params.section } });
     if (!content) {
       return res.status(404).json({ message: 'Section not found' });
     }
@@ -46,21 +43,26 @@ router.get('/:section', async (req, res) => {
 // Update section content (protected)
 router.put('/:section', authMiddleware, async (req, res) => {
   try {
-    let content = await Content.findOne({ section: req.params.section });
+    let content = await Content.findOne({ where: { section: req.params.section } });
+    
     if (!content) {
-      content = new Content({
+      content = await Content.create({
         section: req.params.section,
-        ...req.body
+        ...req.body,
+        lastUpdatedBy: req.user.id
       });
     } else {
-      Object.assign(content, req.body);
+      await content.update({
+        ...req.body,
+        lastUpdatedBy: req.user.id
+      });
     }
-    await content.save();
+    
     res.json(content);
   } catch (error) {
     console.error('Error updating content:', error);
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map(err => err.message);
+    if (error.name === 'SequelizeValidationError') {
+      const messages = error.errors.map(err => err.message);
       return res.status(400).json({ message: messages.join(', ') });
     }
     res.status(500).json({ message: 'Error updating content' });

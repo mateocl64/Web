@@ -3,17 +3,18 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const authMiddleware = require('../middleware/auth');
 const User = require('../models/User');
+const { Op } = require('sequelize');
 
 // Get current user profile
 router.get('/', authMiddleware, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select('-password');
+    const user = await User.findByPk(req.user.id);
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    res.json(user);
+    res.json(user.toJSON());
   } catch (error) {
     console.error('Get profile error:', error);
     res.status(500).json({ message: 'Internal server error' });
@@ -30,7 +31,7 @@ router.put('/', authMiddleware, async (req, res) => {
   }
 
   try {
-    const user = await User.findById(req.user.id);
+    const user = await User.findByPk(req.user.id);
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -43,7 +44,12 @@ router.put('/', authMiddleware, async (req, res) => {
       }
 
       // Check if username is already taken by another user
-      const existingUser = await User.findOne({ username, _id: { $ne: req.user.id } });
+      const existingUser = await User.findOne({ 
+        where: { 
+          username, 
+          id: { [Op.ne]: req.user.id } 
+        } 
+      });
       if (existingUser) {
         return res.status(400).json({ message: 'Username already exists' });
       }
@@ -59,7 +65,12 @@ router.put('/', authMiddleware, async (req, res) => {
       }
 
       // Check if email is already taken by another user
-      const existingUser = await User.findOne({ email, _id: { $ne: req.user.id } });
+      const existingUser = await User.findOne({ 
+        where: { 
+          email, 
+          id: { [Op.ne]: req.user.id } 
+        } 
+      });
       if (existingUser) {
         return res.status(400).json({ message: 'Email already exists' });
       }
@@ -71,14 +82,7 @@ router.put('/', authMiddleware, async (req, res) => {
 
     res.json({
       message: 'Profile updated successfully',
-      user: {
-        id: user._id,
-        username: user.username,
-        email: user.email,
-        role: user.role,
-        createdAt: user.createdAt,
-        lastLogin: user.lastLogin
-      }
+      user: user.toJSON()
     });
   } catch (error) {
     console.error('Update profile error:', error);
@@ -101,7 +105,7 @@ router.put('/password', authMiddleware, async (req, res) => {
   }
 
   try {
-    const user = await User.findById(req.user.id);
+    const user = await User.findByPk(req.user.id);
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -113,7 +117,7 @@ router.put('/password', authMiddleware, async (req, res) => {
       return res.status(401).json({ message: 'Current password is incorrect' });
     }
 
-    // Update password (will be hashed by pre-save hook)
+    // Update password (will be hashed by beforeUpdate hook)
     user.password = newPassword;
     await user.save();
 

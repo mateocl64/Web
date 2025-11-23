@@ -5,8 +5,11 @@ const path = require('path');
 const fs = require('fs');
 require('dotenv').config();
 
-// Import MongoDB connection
-const connectDB = require('./config/database');
+// Import MySQL connection
+const { connectDB } = require('./config/database');
+
+// Import models with associations
+const { User, Service, Content } = require('./models');
 
 const authRoutes = require('./routes/auth');
 const servicesRoutes = require('./routes/services');
@@ -16,7 +19,7 @@ const profileRoutes = require('./routes/profile');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Connect to MongoDB
+// Connect to MySQL
 connectDB();
 
 // Ensure data directory exists (for backup)
@@ -44,7 +47,7 @@ app.get('/api', (req, res) => {
   res.json({
     message: 'Movexa Admin Panel API',
     version: '2.0.0',
-    database: 'MongoDB Atlas',
+    database: 'MySQL (XAMPP)',
     endpoints: {
       auth: {
         login: 'POST /api/auth/login',
@@ -76,7 +79,7 @@ app.get('/api', (req, res) => {
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'OK',
-    database: 'MongoDB',
+    database: 'MySQL',
     timestamp: new Date().toISOString()
   });
 });

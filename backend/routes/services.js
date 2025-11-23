@@ -2,11 +2,19 @@ const express = require('express');
 const router = express.Router();
 const authMiddleware = require('../middleware/auth');
 const Service = require('../models/Service');
+const User = require('../models/User');
 
 // Get all services (public)
 router.get('/', async (req, res) => {
   try {
-    const services = await Service.find({ active: true }).populate('createdBy', 'username');
+    const services = await Service.findAll({ 
+      where: { active: true },
+      include: [{
+        model: User,
+        as: 'creator',
+        attributes: ['username', 'email']
+      }]
+    });
     res.json(services);
   } catch (error) {
     console.error('Error reading services:', error);
@@ -17,7 +25,13 @@ router.get('/', async (req, res) => {
 // Get single service (public)
 router.get('/:id', async (req, res) => {
   try {
-    const service = await Service.findById(req.params.id).populate('createdBy', 'username');
+    const service = await Service.findByPk(req.params.id, {
+      include: [{
+        model: User,
+        as: 'creator',
+        attributes: ['username', 'email']
+      }]
+    });
     
     if (!service) {
       return res.status(404).json({ message: 'Service not found' });
@@ -33,19 +47,17 @@ router.get('/:id', async (req, res) => {
 // Create service (protected)
 router.post('/', authMiddleware, async (req, res) => {
   try {
-    const newService = new Service({
+    const newService = await Service.create({
       ...req.body,
       createdBy: req.user.id
     });
-    
-    await newService.save();
     
     res.status(201).json(newService);
   } catch (error) {
     console.error('Error creating service:', error);
     
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map(err => err.message);
+    if (error.name === 'SequelizeValidationError') {
+      const messages = error.errors.map(err => err.message);
       return res.status(400).json({ message: messages.join(', ') });
     }
     
@@ -56,22 +68,20 @@ router.post('/', authMiddleware, async (req, res) => {
 // Update service (protected)
 router.put('/:id', authMiddleware, async (req, res) => {
   try {
-    const service = await Service.findByIdAndUpdate(
-      req.params.id,
-      { ...req.body },
-      { new: true, runValidators: true }
-    );
+    const service = await Service.findByPk(req.params.id);
     
     if (!service) {
       return res.status(404).json({ message: 'Service not found' });
     }
     
+    await service.update(req.body);
+    
     res.json(service);
   } catch (error) {
     console.error('Error updating service:', error);
     
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map(err => err.message);
+    if (error.name === 'SequelizeValidationError') {
+      const messages = error.errors.map(err => err.message);
       return res.status(400).json({ message: messages.join(', ') });
     }
     
@@ -82,11 +92,13 @@ router.put('/:id', authMiddleware, async (req, res) => {
 // Delete service (protected)
 router.delete('/:id', authMiddleware, async (req, res) => {
   try {
-    const service = await Service.findByIdAndDelete(req.params.id);
+    const service = await Service.findByPk(req.params.id);
     
     if (!service) {
       return res.status(404).json({ message: 'Service not found' });
     }
+    
+    await service.destroy();
     
     res.json({ message: 'Service deleted successfully' });
   } catch (error) {

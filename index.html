@@ -1,164 +1,211 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Movexa</title>
-  <link rel="stylesheet" href="estilos.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movexa - Vista Previa UI Mejorada</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="estilos.css">
 </head>
 <body>
-
-  <!-- Header -->
-   <!-- Font Awesome -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-  <header>
-    <div class="contenedor">
-      <h1 class="logo"><a href="#inicio">Movexa</a></h1>
-      <nav>
-        <ul class="menu">
-          <li><a href="#inicio">Inicio</a></li>
-          <li><a href="#nosotros">Nosotros</a></li>
-          <li><a href="#servicios">Servicios</a></li>
-          <li><a href="#contacto">Contacto</a></li>
-        </ul>
-      </nav>
-    </div>
-  </header>
-
-  <!-- Inicio -->
-  <section id="inicio" class="hero">
-    <div class="texto-hero">
-      <h2>Bienvenidos a Movexa</h2>
-      <p>Especialistas en soluciones de prótesis modernas, humanas y confiables.</p>
-      <img src="img/protesis.jpg" alt="Prótesis moderna">
-    </div>
-  </section>
-
-  <!-- Nosotros -->
-  <section id="nosotros" class="seccion">
-    <div class="contenedor">
-      <h2>Nosotros</h2>
-      <p>Somos un equipo de profesionales comprometidos con mejorar la calidad de vida de las personas a través de soluciones protésicas de última generación.</p>
-      <img src="img/nosotros.png" alt="Equipo profesional">
-      <blockquote>“Restaurar movilidad es devolver libertad.”</blockquote>
-    </div>
-  </section>
-
-  <!-- Servicios -->
-  <section id="servicios" class="seccion fondo-claro">
-    <div class="contenedor">
-      <h2>Nuestros Servicios</h2>
-      <div class="contenedor-servicios">
-        <div class="servicio">
-          <h3>Prótesis Personalizadas</h3>
-          <p>Diseñadas para adaptarse perfectamente a cada paciente.</p>
-          <img src="img/protesiscustom.jpg" alt="Prótesis personalizada">
+    <!-- ============================================
+         HEADER STICKY
+         ============================================ -->
+    <header id="header">
+        <div class="header-container">
+            <a href="#" class="logo">
+                <i class="fas fa-heartbeat"></i> Movexa
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="#hero">Inicio</a></li>
+                    <li><a href="#servicios">Servicios</a></li>
+                    <li><a href="#nosotros">Nosotros</a></li>
+                    <li><a href="#contacto">Contacto</a></li>
+                </ul>
+            </nav>
+            <a href="http://localhost:3000/admin" class="header-cta" target="_blank" rel="noopener">Panel Admin</a>
         </div>
-        <div class="servicio">
-          <h3>Rehabilitación</h3>
-          <p>Acompañamiento integral en el proceso de adaptación.</p>
-          <img src="img/rehab.jpg" alt="Rehabilitación">
+    </header>
+
+    <!-- ============================================
+         HERO SECTION
+         ============================================ -->
+    <section id="hero">
+        <div class="hero-content">
+            <h1>Bienvenidos a Movexa</h1>
+            <p>Especialistas en soluciones de prótesis modernas, humanas y confiables. Restauramos movilidad, devolvemos libertad.</p>
+            <div class="hero-cta">
+                <a href="#servicios" class="btn-primary">Ver Servicios</a>
+                <a href="#contacto" class="btn-secondary">Contáctanos</a>
+            </div>
         </div>
-        <div class="servicio">
-          <h3>Asesoramiento</h3>
-          <p>Te guiamos para que tomes la mejor decisión en tu tratamiento.</p>
-          <img src="img/guía.jpg" alt="Asesoría médica">
+    </section>
+
+    <!-- ============================================
+         SERVICIOS (CARDS)
+         ============================================ -->
+    <section id="servicios">
+        <h2 class="section-title">Nuestros Servicios</h2>
+        <div class="cards-container">
+            <!-- Card 1 -->
+            <div class="card">
+                <div class="card-image">
+                    <i class="fas fa-hand-holding-medical"></i>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">Prótesis Personalizadas</h3>
+                    <p class="card-description">
+                        Diseñadas específicamente para adaptarse perfectamente a cada paciente, 
+                        utilizando tecnología de punta y materiales de alta calidad.
+                    </p>
+                    <a href="#" class="card-link">
+                        Conocer más <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            <!-- Card 2 -->
+            <div class="card">
+                <div class="card-image">
+                    <i class="fas fa-running"></i>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">Rehabilitación Integral</h3>
+                    <p class="card-description">
+                        Acompañamiento completo durante el proceso de adaptación con 
+                        especialistas en fisioterapia y psicología.
+                    </p>
+                    <a href="#" class="card-link">
+                        Conocer más <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            <!-- Card 3 -->
+            <div class="card">
+                <div class="card-image">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">Asesoramiento Profesional</h3>
+                    <p class="card-description">
+                        Te guiamos para que tomes la mejor decisión en tu tratamiento 
+                        con evaluaciones personalizadas y seguimiento continuo.
+                    </p>
+                    <a href="#" class="card-link">
+                        Conocer más <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </section>
-  
-  <!-- Modal -->
-  <div id="modal" class="modal">
-    <div class="modal-contenido">
-      <span class="cerrar" onclick="cerrarModal()">&times;</span>
-      <div id="modal-texto"></div>
-      <img id="modal-img" src="" alt="Imagen ampliada">
-    </div>
-   </div>
+    </section>
 
-  <!-- Contacto -->
-<section id="contacto" class="seccion">
-  <div class="contenedor">
-    <img src="img/Contactanos.png" alt="Contactanos">
-    <h2>Contacto</h2>
-    <p>¿Tienes preguntas? Envíanos un mensaje directamente.</p>
+    <!-- ============================================
+         NOSOTROS
+         ============================================ -->
+    <section id="nosotros" style="background: var(--bg-light);">
+        <h2 class="section-title">Sobre Nosotros</h2>
+        <div style="max-width: 800px; margin: 0 auto; text-align: center;">
+            <p style="font-size: 1.125rem; color: var(--text-light); line-height: 1.8; margin-bottom: 2rem;">
+                Somos un equipo de profesionales comprometidos con mejorar la calidad de vida 
+                de las personas a través de soluciones protésicas de última generación.
+            </p>
+            <blockquote style="font-size: 1.5rem; font-weight: 600; color: var(--primary-color); font-family: var(--font-primary); font-style: italic;">
+                "Restaurar movilidad es devolver libertad"
+            </blockquote>
+        </div>
+    </section>
 
-    <form action="https://formsubmit.co/msas@movexa.com" method="POST" class="formulario-contacto">
-      <!-- CAMPO OCULTO para evitar SPAM -->
-      <input type="hidden" name="_captcha" value="false">
+    <!-- ============================================
+         FOOTER
+         ============================================ -->
+    <footer>
+        <div class="footer-container">
+            <!-- Columna 1 -->
+            <div class="footer-column">
+                <h3><i class="fas fa-heartbeat"></i> Movexa</h3>
+                <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.6;">
+                    Especialistas en soluciones de prótesis médicas modernas y personalizadas.
+                </p>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <!-- Columna 2 -->
+            <div class="footer-column">
+                <h3>Enlaces Rápidos</h3>
+                <ul>
+                    <li><a href="#hero">Inicio</a></li>
+                    <li><a href="#servicios">Servicios</a></li>
+                    <li><a href="#nosotros">Nosotros</a></li>
+                    <li><a href="#contacto">Contacto</a></li>
+                </ul>
+            </div>
+            <!-- Columna 3 -->
+            <div class="footer-column">
+                <h3>Servicios</h3>
+                <ul>
+                    <li><a href="#">Prótesis Personalizadas</a></li>
+                    <li><a href="#">Rehabilitación</a></li>
+                    <li><a href="#">Asesoramiento</a></li>
+                    <li><a href="#">Tecnología Médica</a></li>
+                </ul>
+            </div>
+            <!-- Columna 4 -->
+            <div class="footer-column">
+                <h3>Contacto</h3>
+                <ul style="list-style: none;">
+                    <li style="margin-bottom: 0.75rem;">
+                        <i class="fas fa-map-marker-alt"></i> Medellín, Colombia
+                    </li>
+                    <li style="margin-bottom: 0.75rem;">
+                        <i class="fas fa-phone"></i> +57 300 123 4567
+                    </li>
+                    <li style="margin-bottom: 0.75rem;">
+                        <i class="fas fa-envelope"></i> msas@movexa.com
+                    </li>
+                    <li>
+                        <i class="fas fa-clock"></i> Lun - Sáb: 8:00 AM - 8:00 PM
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Movexa S.A. Todos los derechos reservados.</p>
+        </div>
+    </footer>
 
-      <input type="text" name="nombre" placeholder="Tu nombre" required>
-      <input type="email" name="email" placeholder="Tu correo electrónico" required>
-      <textarea name="mensaje" placeholder="Escribe tu mensaje aquí..." rows="5" required></textarea>
-
-      <button type="submit">Enviar Mensaje</button>
-    </form>
-
-    <blockquote>“Tu bienestar es nuestra prioridad.”</blockquote>
-  </div>
-</section>
-
-  <!-- Footer -->
-  <footer>
-    <p>&copy; 2025 Movexa SA. Todos los derechos reservados.</p>
-  </footer>
-  <!-- Footer -->
-<footer class="footer">
-  <div class="contenedor footer-contenido">
-    <div class="footer-info">
-      <p>
-        <a href="https://www.google.com/maps?q=Medellín, Colombia" target="_blank">
-          <i class="fas fa-map-marker-alt"></i> Medellín, Colombia
-        </a>
-      </p>
-      <p>
-        <a href="mailto:msas@movexa.com">
-          <i class="fas fa-envelope"></i> msas@movexa.com
-        </a>
-      </p>
-      <p>
-        <a href="https://wa.me/573001234567" target="_blank">
-          <i class="fab fa-whatsapp"></i> +57 300 123 4567
-        </a>
-      </p>
-      <p>
-        <i class="fas fa-clock"></i> Lunes a Sábado: 8:00 a.m. - 8:00 p.m.
-      </p>
-    </div>
-  </div>
-</footer>
-
-<script>
-  const modal = document.getElementById("modal");
-  const modalTexto = document.getElementById("modal-texto");
-  const modalImg = document.getElementById("modal-img");
-
-  function abrirModal(texto, imagen) {
-    modalTexto.innerHTML = texto;
-    modalImg.src = imagen;
-    modal.style.display = "flex"; // <-- Este punto es importante
-  }
-
-  function cerrarModal() {
-    modal.style.display = "none";
-  }
-
-  document.querySelectorAll(".servicio").forEach(servicio => {
-    servicio.addEventListener("click", () => {      
-      const titulo = servicio.querySelector("h3").textContent;
-      const desc = servicio.querySelector("p").textContent;
-      const img = servicio.querySelector("img").src;
-      abrirModal(<div><h3>${titulo}</h3><p>${desc}</p></div>, img);
-    });
-  });
-
-  window.onclick = function(event) {
-    if (event.target == modal) cerrarModal();
-  };
-</script>
-
-
+    <!-- ============================================
+         JAVASCRIPT
+         ============================================ -->
+    <script>
+        // Header sticky effect
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>
